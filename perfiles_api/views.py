@@ -32,3 +32,12 @@ class HelloApiView(APIView):
         serializer.errors, 
         status=status.HTTP_400_BAD_REQUEST
       )
+    
+  def put(self, request, pk=None):
+    return Response({'metodo':'PUT'})
+  
+  def patch(self, request, pk=None):
+    return Response({'metodo':'PATCH'})
+  
+  def delete(self, request, pk=None):
+    return Response({'metodo':'DELETE'})
