@@ -1,8 +1,13 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import status
+
+from perfiles_api import serializers
 
 
 class HelloApiView(APIView):
+  serializer_class = serializers.HelloSerializer
+
   def get(self, request, format= None):
     
     caracteristicas = [
@@ -11,5 +16,19 @@ class HelloApiView(APIView):
       'Da mayor control sobre la logica de tu aplicaciion',
       'Is mapedo manualmente a las URLs'
     ]
-    
+
     return Response({'message': 'Hello world', 'caracteristicas':caracteristicas})
+  
+  def post(self, request):
+    serializer = self.serializer_class(data = request.data)
+
+    if serializer.is_valid():
+      nombre = serializer.validated_data.get('nombre')
+      mensaje = f'Hola {nombre}'
+      return Response({'mensaje':mensaje})
+    
+    else:
+      return Response(
+        serializer.errors, 
+        status=status.HTTP_400_BAD_REQUEST
+      )
