@@ -1,4 +1,36 @@
 from rest_framework import serializers
 
+from perfiles_api import models
+
 class HelloSerializer(serializers.Serializer):
   nombre = serializers.CharField(max_length = 10)
+
+class UserProfileSerializer(serializers.ModelSerializer):
+  #Revisar el siguiente recurso - bug en el password se hashearse
+  #https://github.com/LondonAppDev/profiles-rest-api/blob/master/profiles_api/serializers.py#L34
+  class Meta:
+    model = models.UserProfile
+    fields = ('id','email','name','password')
+    extra_kwargs = {
+      'password':{
+        'write_only':True,
+        'style':{'input_type':'password'}
+      }
+    }
+
+  def create(self, validated_data):
+    user = models.UserProfile.objects.create_user(
+      email = validated_data['email'],
+      name = validated_data['name'],
+      password = validated_data['password']
+    )
+
+    return user
+  
+  def update(self, instance, validated_data):
+        """Handle updating user account"""
+        if 'password' in validated_data:
+            password = validated_data.pop('password')
+            instance.set_password(password)
+
+        return super().update(instance, validated_data)
